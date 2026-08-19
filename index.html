@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#b90000" />
+  <meta name="description" content="Rota Team 1–4 — prywatny planer roty, OFF TASK, Holiday, Overtime i Sick dla Androida." />
+  <title>Rota Team — Android</title>
+  <style>
+    :root{
+      --red:#b90000;
+      --red-dark:#8f0000;
+      --cream:#f4eee2;
+      --cream-2:#fffaf2;
+      --lime:#c6dd00;
+      --ink:#1f2024;
+      --muted:#6e6b66;
+      --line:#d8cdbc;
+      --white:#ffffff;
+      --shadow:0 16px 50px rgba(74,0,0,.18);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:var(--cream);
+      color:var(--ink);
+      line-height:1.55;
+    }
+    a{text-decoration:none;color:inherit}
+    .topbar{
+      position:sticky;top:0;z-index:20;
+      background:rgba(185,0,0,.96);
+      color:#fff;
+      border-bottom:3px solid var(--lime);
+      backdrop-filter:blur(10px);
+    }
+    .nav{
+      max-width:1080px;margin:auto;padding:14px 20px;
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+    }
+    .brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:.4px}
+    .logo{
+      width:42px;height:42px;border-radius:12px;
+      display:grid;place-items:center;
+      background:var(--cream-2);color:var(--red);
+      border:2px solid var(--lime);
+      font-weight:1000;
+      box-shadow:0 5px 15px rgba(0,0,0,.18);
+    }
+    .lang{
+      border:1px solid rgba(255,255,255,.55);
+      background:rgba(255,255,255,.12);
+      color:#fff;border-radius:999px;padding:9px 14px;
+      font-weight:800;cursor:pointer;
+    }
+    .hero{
+      background:
+        radial-gradient(circle at 85% 15%, rgba(198,221,0,.20), transparent 25%),
+        linear-gradient(135deg,#c50000 0%,#a50000 60%,#7d0000 100%);
+      color:white;
+      border-bottom:4px solid var(--lime);
+    }
+    .hero-inner{
+      max-width:1080px;margin:auto;padding:64px 20px 54px;
+      display:grid;grid-template-columns:1.25fr .75fr;gap:38px;align-items:center;
+    }
+    .eyebrow{
+      display:inline-flex;gap:8px;align-items:center;
+      font-weight:900;letter-spacing:.08em;text-transform:uppercase;
+      color:#fff4b3;font-size:.86rem;margin-bottom:12px;
+    }
+    h1{font-size:clamp(2.55rem,7vw,5rem);line-height:.96;margin:0 0 18px;font-weight:1000}
+    .lead{font-size:clamp(1.05rem,2.2vw,1.35rem);max-width:720px;color:#fff4ee;margin:0 0 28px}
+    .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:10px;
+      min-height:50px;padding:0 20px;border-radius:14px;font-weight:900;
+      border:2px solid transparent;transition:.18s ease;
+    }
+    .btn-primary{background:var(--cream-2);color:var(--red);border-color:var(--lime)}
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(0,0,0,.18)}
+    .btn-ghost{border-color:rgba(255,255,255,.6);color:white;background:rgba(255,255,255,.07)}
+    .micro{font-size:.9rem;color:#f8d7d7}
+    .phone{
+      background:#111827;border:8px solid #222;border-radius:34px;padding:12px;
+      box-shadow:var(--shadow);max-width:310px;justify-self:center;
+      transform:rotate(2deg);
+    }
+    .screen{
+      border-radius:24px;overflow:hidden;background:var(--cream-2);min-height:470px;
+      border:2px solid #151515;
+    }
+    .screen-head{background:var(--red);color:white;padding:20px 18px;border-bottom:3px solid var(--lime)}
+    .screen-head .small{font-weight:900;font-size:.86rem}
+    .screen-head .big{font-weight:1000;font-size:1.62rem;margin-top:12px}
+    .card{
+      margin:16px;background:#fffaf2;border:2px solid #b43131;border-radius:20px;padding:18px;color:#1e1e1e;
+    }
+    .card strong{font-size:1.2rem;color:var(--red)}
+    .timer{font-size:2rem;font-weight:1000;margin:12px 0 4px}
+    .fakebtn{background:var(--red);color:#fff;border:2px solid var(--lime);padding:13px;border-radius:14px;text-align:center;font-weight:1000;margin-top:14px}
+    .calendar{padding:0 16px 18px;display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+    .day{height:33px;border-radius:8px;background:#eef2ff;display:grid;place-items:center;font-size:.72rem}
+    .day.off{background:#def6df}
+    .section{max-width:1080px;margin:auto;padding:62px 20px}
+    .section h2{font-size:clamp(1.8rem,4vw,2.8rem);margin:0 0 12px}
+    .section-intro{color:var(--muted);max-width:760px;margin:0 0 30px}
+    .grid{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
+    }
+    .feature{
+      background:var(--cream-2);border:1px solid var(--line);border-radius:22px;padding:24px;
+      box-shadow:0 8px 25px rgba(65,30,0,.06);
+    }
+    .feature .ico{
+      width:46px;height:46px;border-radius:13px;display:grid;place-items:center;
+      background:var(--red);color:#fff;border:2px solid var(--lime);font-size:1.3rem;margin-bottom:14px;
+    }
+    .feature h3{margin:0 0 7px;font-size:1.15rem}
+    .feature p{margin:0;color:var(--muted)}
+    .download{
+      max-width:1080px;margin:0 auto 62px;padding:0 20px;
+    }
+    .download-box{
+      background:linear-gradient(135deg,#151515,#2a0909);
+      color:#fff;border-radius:26px;padding:34px;border:2px solid var(--lime);
+      box-shadow:var(--shadow);
+      display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+    }
+    .download-box h2{margin:0 0 8px;font-size:2rem}
+    .download-box p{margin:0;color:#e6dada;max-width:650px}
+    .info{
+      display:grid;grid-template-columns:1fr 1fr;gap:18px;
+    }
+    .panel{
+      background:#fffaf2;border-radius:22px;border:1px solid var(--line);padding:24px;
+    }
+    .panel h3{margin-top:0}
+    .chips{display:flex;gap:9px;flex-wrap:wrap}
+    .chip{padding:8px 11px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:800}
+    footer{
+      background:#1b0b0b;color:#e9dddd;border-top:3px solid var(--lime);
+    }
+    .foot{max-width:1080px;margin:auto;padding:34px 20px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    .foot strong{color:white}
+    .legal{max-width:1080px;margin:auto;padding:0 20px 30px;color:#bfb0b0;font-size:.9rem}
+    @media(max-width:820px){
+      .hero-inner{grid-template-columns:1fr;padding-top:48px}
+      .phone{display:none}
+      .grid{grid-template-columns:1fr}
+      .info{grid-template-columns:1fr}
+      .nav{padding-left:14px;padding-right:14px}
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="nav">
+    <a class="brand" href="#top" aria-label="Rota Team">
+      <span class="logo">RT</span>
+      <span>ROTA TEAM</span>
+    </a>
+    <button class="lang" id="langBtn">PL / EN</button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="eyebrow" data-pl="ANDROID • TEAM 1–4 • POWERED BY REMI" data-en="ANDROID • TEAM 1–4 • POWERED BY REMI">
+          ANDROID • TEAM 1–4 • POWERED BY REMI
+        </div>
+        <h1 data-pl="Twoja rota. Bez zgadywania." data-en="Your rota. No guessing.">Twoja rota. Bez zgadywania.</h1>
+        <p class="lead"
+           data-pl="Rota Team pomaga sprawdzić pracę i wolne, śledzić OFF TASK oraz oznaczać Holiday, Overtime i Sick — wszystko lokalnie na telefonie."
+           data-en="Rota Team helps you check work and days off, track OFF TASK, and mark Holiday, Overtime and Sick — all stored locally on your phone.">
+          Rota Team pomaga sprawdzić pracę i wolne, śledzić OFF TASK oraz oznaczać Holiday, Overtime i Sick — wszystko lokalnie na telefonie.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/remikrysiak-rgb/Rota-Team/releases/latest" target="_blank" rel="noopener"
+             data-pl="⬇ POBIERZ NA ANDROIDA" data-en="⬇ DOWNLOAD FOR ANDROID">⬇ POBIERZ NA ANDROIDA</a>
+          <a class="btn btn-ghost" href="#features"
+             data-pl="ZOBACZ FUNKCJE" data-en="SEE FEATURES">ZOBACZ FUNKCJE</a>
+        </div>
+        <div class="micro"
+             data-pl="Android 8.0+ • instalacja APK • bez konta • dane lokalne"
+             data-en="Android 8.0+ • APK install • no account • local data">
+          Android 8.0+ • instalacja APK • bez konta • dane lokalne
+        </div>
+      </div>
+
+      <div class="phone" aria-hidden="true">
+        <div class="screen">
+          <div class="screen-head">
+            <div class="small">ROTA • TEAM 4</div>
+            <div class="big">Dzisiaj PRACA</div>
+            <div>Środa, 12 sierpnia</div>
+          </div>
+          <div class="card">
+            <strong>OFF TASK</strong>
+            <div class="timer">00:36:08 / 00:07:14</div>
+            <div>Pozostało: 02:23:52</div>
+            <div class="fakebtn">START / STOP</div>
+          </div>
+          <div class="calendar">
+            <div class="day">1</div><div class="day">2</div><div class="day">3</div><div class="day off">4</div><div class="day off">5</div><div class="day">6</div><div class="day">7</div>
+            <div class="day">8</div><div class="day">9</div><div class="day off">10</div><div class="day">11</div><div class="day">12</div><div class="day">13</div><div class="day">14</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <h2 data-pl="Najważniejsze funkcje" data-en="Key features">Najważniejsze funkcje</h2>
+    <p class="section-intro"
+       data-pl="Prosta aplikacja zrobiona pod realne użycie na zmianie — szybko sprawdzasz to, co potrzebne."
+       data-en="A simple app built for real shift use — quickly check what you actually need.">
+      Prosta aplikacja zrobiona pod realne użycie na zmianie — szybko sprawdzasz to, co potrzebne.
+    </p>
+
+    <div class="grid">
+      <article class="feature">
+        <div class="ico">📅</div>
+        <h3 data-pl="Rota Team 1–4" data-en="Team 1–4 rota">Rota Team 1–4</h3>
+        <p data-pl="Wybierasz swój Team raz. Jeśli kiedyś go zmienisz, możesz przełączyć go w aplikacji."
+           data-en="Choose your Team once. If you move teams later, you can change it in the app.">
+          Wybierasz swój Team raz. Jeśli kiedyś go zmienisz, możesz przełączyć go w aplikacji.
+        </p>
+      </article>
+
+      <article class="feature">
+        <div class="ico">⏱️</div>
+        <h3>OFF TASK</h3>
+        <p data-pl="Tygodniowy licznik, aktualna sesja, ustawiany limit i przypomnienia po wybranej liczbie minut."
+           data-en="Weekly total, current session, adjustable limit and reminders after a chosen number of minutes.">
+          Tygodniowy licznik, aktualna sesja, ustawiany limit i przypomnienia po wybranej liczbie minut.
+        </p>
+      </article>
+
+      <article class="feature">
+        <div class="ico">🏷️</div>
+        <h3 data-pl="Oznacz dzień" data-en="Mark a day">Oznacz dzień</h3>
+        <p data-pl="Holiday, Overtime i Sick są widoczne bezpośrednio w kalendarzu i uwzględniane w komunikatach."
+           data-en="Holiday, Overtime and Sick appear directly in the calendar and status messages.">
+          Holiday, Overtime i Sick są widoczne bezpośrednio w kalendarzu i uwzględniane w komunikatach.
+        </p>
+      </article>
+
+      <article class="feature">
+        <div class="ico">🔔</div>
+        <h3 data-pl="Przypomnienia" data-en="Reminders">Przypomnienia</h3>
+        <p data-pl="Ustaw własny czas przypomnienia OFF TASK. Aplikacja może powiadomić Cię także po jej zamknięciu."
+           data-en="Set your own OFF TASK reminder time. The app can notify you even after it has been closed.">
+          Ustaw własny czas przypomnienia OFF TASK. Aplikacja może powiadomić Cię także po jej zamknięciu.
+        </p>
+      </article>
+
+      <article class="feature">
+        <div class="ico">🌍</div>
+        <h3 data-pl="Wiele języków" data-en="Multiple languages">Wiele języków</h3>
+        <p data-pl="Polski, English, Română i हिन्दी. Interfejs można zmienić bez resetowania danych."
+           data-en="Polski, English, Română and हिन्दी. Change the interface language without resetting data.">
+          Polski, English, Română i हिन्दी. Interfejs można zmienić bez resetowania danych.
+        </p>
+      </article>
+
+      <article class="feature">
+        <div class="ico">🔒</div>
+        <h3 data-pl="Dane lokalne" data-en="Local data">Dane lokalne</h3>
+        <p data-pl="Rota, Holiday, Overtime, Sick i OFF TASK są zapisywane lokalnie na urządzeniu."
+           data-en="Rota, Holiday, Overtime, Sick and OFF TASK are stored locally on your device.">
+          Rota, Holiday, Overtime, Sick i OFF TASK są zapisywane lokalnie na urządzeniu.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="download">
+    <div class="download-box">
+      <div>
+        <h2 data-pl="Gotowy do instalacji?" data-en="Ready to install?">Gotowy do instalacji?</h2>
+        <p data-pl="Pobierz najnowszą wersję z GitHub Releases. Android może poprosić o zgodę na instalację aplikacji z tego źródła."
+           data-en="Download the latest version from GitHub Releases. Android may ask you to allow app installation from this source.">
+          Pobierz najnowszą wersję z GitHub Releases. Android może poprosić o zgodę na instalację aplikacji z tego źródła.
+        </p>
+      </div>
+      <a class="btn btn-primary" href="https://github.com/remikrysiak-rgb/Rota-Team/releases/latest" target="_blank" rel="noopener"
+         data-pl="POBIERZ APK" data-en="DOWNLOAD APK">POBIERZ APK</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="info">
+      <div class="panel">
+        <h3 data-pl="Obsługiwane oznaczenia" data-en="Supported day markers">Obsługiwane oznaczenia</h3>
+        <div class="chips">
+          <span class="chip">P — Praca / Work</span>
+          <span class="chip">W — Wolne / Off</span>
+          <span class="chip">OT — Overtime</span>
+          <span class="chip">U — Holiday</span>
+          <span class="chip">S — Sick</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3 data-pl="Kontakt" data-en="Contact">Kontakt</h3>
+        <p><strong>Remigiusz Krysiak</strong><br>
+          <a href="mailto:remikrysiak@gmail.com">remikrysiak@gmail.com</a>
+        </p>
+        <p style="margin-bottom:0;color:var(--muted)">Powered by Remi</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot">
+    <div><strong>ROTA TEAM</strong><br><span>Team 1–4 • Android</span></div>
+    <div>© 2026 Remigiusz Krysiak</div>
+  </div>
+  <div class="legal"
+       data-pl="To nieoficjalne, prywatne narzędzie. Aplikacja nie jest powiązana z Frasers Group ani przez nią zatwierdzona. Aktualne zasady firmy i polecenia przełożonych mają zawsze pierwszeństwo."
+       data-en="This is an unofficial personal tool. The app is not affiliated with or endorsed by Frasers Group. Current company rules and management instructions always take priority.">
+    To nieoficjalne, prywatne narzędzie. Aplikacja nie jest powiązana z Frasers Group ani przez nią zatwierdzona. Aktualne zasady firmy i polecenia przełożonych mają zawsze pierwszeństwo.
+  </div>
+</footer>
+
+<script>
+  let lang = "pl";
+  const btn = document.getElementById("langBtn");
+
+  function applyLanguage() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-pl][data-en]").forEach(el => {
+      el.textContent = el.dataset[lang];
+    });
+    btn.textContent = lang === "pl" ? "PL / EN" : "EN / PL";
+    document.title = lang === "pl" ? "Rota Team — Android" : "Rota Team — Android";
+  }
+
+  btn.addEventListener("click", () => {
+    lang = lang === "pl" ? "en" : "pl";
+    applyLanguage();
+  });
+
+  applyLanguage();
+</script>
+</body>
+</html>
