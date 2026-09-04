@@ -1,7 +1,7 @@
 {
-  "versionCode": 41,
-  "versionName": "1.13.5",
+  "versionCode": 42,
+  "versionName": "1.13.6",
   "apkUrl": "https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk",
-  "sha256": "e73b6e0584489f0b66594d230c2f1fc42e5bee66f8c978e28537bd1e2706bccf",
-  "notes": "Nowość / New / Nou / नया / Nauja: płynniejszy i czulszy swipe kalendarza, lepiej widoczne święta oraz własne wydarzenia całodniowe lub na konkretną godzinę z oznaczeniem 🔔."
+  "sha256": "14e9ca9c9c48e280e60911414d534546cd4ce84666d742ca47270df10a4ca312",
+  "notes": "Nowość / New / Nou / नया / Nauja: poprawione skalowanie widżetu na Samsung Fold i dużych ekranach; na standardowych telefonach wygląd widżetu pozostaje bez zmian."
 }
