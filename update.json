@@ -1,7 +1,7 @@
 {
-  "versionCode": 37,
-  "versionName": "1.13.1",
+  "versionCode": 41,
+  "versionName": "1.13.5",
   "apkUrl": "https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk",
-  "sha256": "7221a0757d632261e33b33c6a391d25e13d76f9f5f8868000a48b56b7e402080",
-  "notes": "Nowość / New / Nou / नया / Nauja: wszystkie główne ustawienia wypłaty od razu przeliczają wynik; edytowalna pensja roczna, pension 0%, Fire Aid / Fire Marshal i First Aid."
+  "sha256": "e73b6e0584489f0b66594d230c2f1fc42e5bee66f8c978e28537bd1e2706bccf",
+  "notes": "Nowość / New / Nou / नया / Nauja: płynniejszy i czulszy swipe kalendarza, lepiej widoczne święta oraz własne wydarzenia całodniowe lub na konkretną godzinę z oznaczeniem 🔔."
 }
