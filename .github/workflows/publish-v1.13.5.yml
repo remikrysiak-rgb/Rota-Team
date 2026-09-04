@@ -1,0 +1,43 @@
+name: Publish Rota Team v1.13.5
+
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-v1.13.5.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Download tested v1.13.5 artifact
+        run: |
+          curl -L --fail --retry 3 'https://sdmntprdenmarkeast.oaiusercontent.com/files/00000000-4fe0-8210-8257-9baa2acdfd72/raw?se=2026-09-04T21%3A44%3A12Z&sp=r&sv=2026-02-06&sr=b&scid=0594de4a-d1dd-53c4-985b-35846df07b1f&skoid=a4604a88-85e4-4562-b6ab-a5622268de80&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-04T06%3A26%3A35Z&ske=2026-09-05T06%3A26%3A35Z&sks=b&skv=2026-02-06&sig=jbZ/OtDyBQbm/VvObSEghzxoPawQ6bBysZww3iZ4q%2BU%3D' -o artifact.zip
+          unzip -q artifact.zip -d artifact
+          test -f artifact/RotaTeam-v1.13.5.apk
+          cp artifact/RotaTeam-v1.13.5.apk RotaTeam.apk
+          echo 'e73b6e0584489f0b66594d230c2f1fc42e5bee66f8c978e28537bd1e2706bccf  RotaTeam.apk' | sha256sum -c -
+      - name: Update public metadata and page
+        run: |
+          cat > update.json <<'EOF'
+          {
+            "versionCode": 41,
+            "versionName": "1.13.5",
+            "apkUrl": "https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk",
+            "sha256": "e73b6e0584489f0b66594d230c2f1fc42e5bee66f8c978e28537bd1e2706bccf",
+            "notes": "Nowość / New / Nou / नया / Nauja: płynniejszy i czulszy swipe kalendarza, lepiej widoczne święta oraz własne wydarzenia całodniowe lub na konkretną godzinę z oznaczeniem 🔔."
+          }
+          EOF
+          sed -i 's/1\.13\.1/1.13.5/g' index.html
+          printf '# Rota-Team\nRota Team 1–4 • Work rota and OFF TASK tracker for Android\n\nCurrent public version: 1.13.5\n' > README.md
+      - name: Publish and remove one-time workflow
+        run: |
+          rm -f .github/workflows/publish-v1.13.5.yml
+          git config user.name 'Rota Team Publisher'
+          git config user.email 'actions@users.noreply.github.com'
+          git add RotaTeam.apk update.json index.html README.md .github/workflows/publish-v1.13.5.yml
+          git commit -m 'Publish Rota Team v1.13.5 as current public version'
+          git push
