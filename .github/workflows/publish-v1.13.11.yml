@@ -1,0 +1,77 @@
+name: Publish Rota Team v1.13.11
+
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-v1.13.11.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout public repo
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Download verified v1.13.11 artifact
+        env:
+          ARTIFACT_URL: 'https://sdmntprnortheu.oaiusercontent.com/files/00000000-2390-81f4-ac24-d61dd7fda75d/raw?se=2026-09-09T22%3A40%3A02Z&sp=r&sv=2026-02-06&sr=b&scid=f877b923-6b2b-54b2-a75c-976d40c00100&skoid=a4604a88-85e4-4562-b6ab-a5622268de80&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-09T19%3A07%3A01Z&ske=2026-09-10T19%3A07%3A01Z&sks=b&skv=2026-02-06&sig=B48chTPVogu295mhSm%2BzxsxQE%2B/qYDLJ3O%2BNWzMLLtQ%3D'
+        run: |
+          curl --fail --location --retry 3 "$ARTIFACT_URL" -o /tmp/rt1311.zip
+          rm -rf /tmp/rt1311
+          mkdir -p /tmp/rt1311
+          unzip -q /tmp/rt1311.zip -d /tmp/rt1311
+          test -f /tmp/rt1311/RotaTeam-v1.13.11-test.apk
+          echo 'e699bb66d41e1cdb53b75d1380f17ab9722a92f4a5b353b8c7b99269719e78ec  /tmp/rt1311/RotaTeam-v1.13.11-test.apk' | sha256sum -c -
+
+      - name: Publish APK and update metadata
+        run: |
+          cp /tmp/rt1311/RotaTeam-v1.13.11-test.apk RotaTeam.apk
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          update = {
+              'versionCode': 47,
+              'versionName': '1.13.11',
+              'apkUrl': 'https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk',
+              'sha256': 'e699bb66d41e1cdb53b75d1380f17ab9722a92f4a5b353b8c7b99269719e78ec',
+              'notes': 'Nowość / New / Nou / नया / Nauja: odświeżony, bardziej kompaktowy ekran główny; usunięto slogan oraz zbędny kafelek Team/Contract, zachowano datę i najważniejsze informacje. Widżet bez zmian.'
+          }
+          Path('update.json').write_text(json.dumps(update, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          p = Path('index.html')
+          if p.exists():
+              s = p.read_text(encoding='utf-8')
+              s = s.replace('v1.13.6', 'v1.13.11')
+              s = s.replace('wersję 1.13.6', 'wersję 1.13.11')
+              s = s.replace('version 1.13.6', 'version 1.13.11')
+              s = s.replace('versiunea 1.13.6', 'versiunea 1.13.11')
+              s = s.replace('1.13.6 संस्करण', '1.13.11 संस्करण')
+              s = s.replace('1.13.6 versiją', '1.13.11 versiją')
+              p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Verify public payload
+        run: |
+          test "$(sha256sum RotaTeam.apk | awk '{print $1}')" = 'e699bb66d41e1cdb53b75d1380f17ab9722a92f4a5b353b8c7b99269719e78ec'
+          grep -q '"versionCode": 47' update.json
+          grep -q '"versionName": "1.13.11"' update.json
+          grep -q 'v1.13.11' index.html
+
+      - name: Commit public v1.13.11
+        run: |
+          git config user.name 'Rota Team Publisher'
+          git config user.email 'actions@users.noreply.github.com'
+          git add RotaTeam.apk update.json index.html
+          if git diff --cached --quiet; then
+            echo 'Nothing to publish.'
+            exit 0
+          fi
+          git commit -m 'Publish Rota Team v1.13.11'
+          git push origin HEAD:main
