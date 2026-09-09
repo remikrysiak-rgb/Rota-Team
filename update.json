@@ -1,7 +1,7 @@
 {
-  "versionCode": 42,
-  "versionName": "1.13.6",
+  "versionCode": 47,
+  "versionName": "1.13.11",
   "apkUrl": "https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk",
-  "sha256": "14e9ca9c9c48e280e60911414d534546cd4ce84666d742ca47270df10a4ca312",
-  "notes": "Nowość / New / Nou / नया / Nauja: poprawione skalowanie widżetu na Samsung Fold i dużych ekranach; na standardowych telefonach wygląd widżetu pozostaje bez zmian."
+  "sha256": "e699bb66d41e1cdb53b75d1380f17ab9722a92f4a5b353b8c7b99269719e78ec",
+  "notes": "Nowość / New / Nou / नया / Nauja: odświeżony, bardziej kompaktowy ekran główny; usunięto slogan oraz zbędny kafelek Team/Contract, zachowano datę i najważniejsze informacje. Widżet bez zmian."
 }
