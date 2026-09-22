@@ -1,7 +1,7 @@
 {
-  "versionCode": 47,
-  "versionName": "1.13.11",
+  "versionCode": 75,
+  "versionName": "1.13.39",
   "apkUrl": "https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk",
-  "sha256": "e699bb66d41e1cdb53b75d1380f17ab9722a92f4a5b353b8c7b99269719e78ec",
-  "notes": "Nowość / New / Nou / नया / Nauja: odświeżony, bardziej kompaktowy ekran główny; usunięto slogan oraz zbędny kafelek Team/Contract, zachowano datę i najważniejsze informacje. Widżet bez zmian."
+  "sha256": "7118fb90fdb79cf9459393c70dadf39978410de7d586162dc90673a8dad21a7c",
+  "notes": "Nowość / New / Nou / नया / Nauja: rozbudowany kalendarz świąt nietypowych — 1098 pozycji, trzy na każdy dzień roku, także 29 lutego. Baza działa offline."
 }
