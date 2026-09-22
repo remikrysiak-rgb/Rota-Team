@@ -1,0 +1,85 @@
+name: Publish Rota Team v1.13.39
+
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-v1.13.39.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout public repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Download verified v1.13.39 build
+        env:
+          ARTIFACT_URL: 'https://sdmntprdenmarkeast.oaiusercontent.com/files/00000000-1464-8210-8168-550bc98dd610/raw?se=2026-09-22T21%3A45%3A30Z&sp=r&sv=2026-02-06&sr=b&scid=01a0cb0b-012e-708a-800b-2ffa31611c29&skoid=a4604a88-85e4-4562-b6ab-a5622268de80&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-22T17%3A26%3A48Z&ske=2026-09-23T17%3A26%3A48Z&sks=b&skv=2026-02-06&sig=AiPV7UswUrQqsRupZ5pwnZdUsNk%2BHqwS/jese44QaGw%3D'
+        run: |
+          curl --fail --location --retry 3 "$ARTIFACT_URL" -o /tmp/rotateam-11339.zip
+          mkdir -p /tmp/rotateam-11339
+          unzip -q /tmp/rotateam-11339.zip -d /tmp/rotateam-11339
+          test -f /tmp/rotateam-11339/RotaTeam-v1.13.39-test.apk
+          echo '7118fb90fdb79cf9459393c70dadf39978410de7d586162dc90673a8dad21a7c  /tmp/rotateam-11339/RotaTeam-v1.13.39-test.apk' | sha256sum -c -
+
+      - name: Prepare public files
+        run: |
+          cp /tmp/rotateam-11339/RotaTeam-v1.13.39-test.apk RotaTeam.apk
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          expected = '7118fb90fdb79cf9459393c70dadf39978410de7d586162dc90673a8dad21a7c'
+          update = {
+              'versionCode': 75,
+              'versionName': '1.13.39',
+              'apkUrl': 'https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk',
+              'sha256': expected,
+              'notes': 'Nowość / New / Nou / नया / Nauja: rozbudowany kalendarz świąt nietypowych — 1098 pozycji, trzy na każdy dzień roku, także 29 lutego. Baza działa offline.'
+          }
+          Path('update.json').write_text(json.dumps(update, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          page = Path('index.html')
+          text = page.read_text(encoding='utf-8')
+          for old in ('1.13.6', '1.13.11'):
+              text = text.replace(old, '1.13.39')
+          text = text.replace(
+              'Czytelny kalendarz pionowy i panoramiczny, szybkie przesuwanie miesięcy oraz święta i informacje o wybranym dniu.',
+              'Czytelny kalendarz pionowy i panoramiczny oraz trzy święta nietypowe na każdy dzień roku — 1098 pozycji dostępnych offline.')
+          text = text.replace(
+              'Clear portrait and landscape calendars, smooth month browsing, holidays and useful information for the selected day.',
+              'Clear portrait and landscape calendars plus three unusual observances for every day of the year — 1,098 entries available offline.')
+          page.write_text(text, encoding='utf-8')
+
+          readme = Path('README.md')
+          lines = readme.read_text(encoding='utf-8').splitlines()
+          lines = ['Current public version: 1.13.39' if line.startswith('Current public version:') else line for line in lines]
+          readme.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+          PY
+
+      - name: Verify public payload
+        run: |
+          test "$(sha256sum RotaTeam.apk | awk '{print $1}')" = '7118fb90fdb79cf9459393c70dadf39978410de7d586162dc90673a8dad21a7c'
+          grep -q '"versionCode": 75' update.json
+          grep -q '"versionName": "1.13.39"' update.json
+          grep -q 'v1.13.39' index.html
+          grep -q '1098 pozycji' index.html
+          grep -q 'Current public version: 1.13.39' README.md
+
+      - name: Commit public v1.13.39
+        run: |
+          git config user.name 'Rota Team Publisher'
+          git config user.email 'actions@users.noreply.github.com'
+          git add RotaTeam.apk update.json index.html README.md
+          if git diff --cached --quiet; then
+            echo 'Nothing to publish.'
+            exit 0
+          fi
+          git commit -m 'Publish Rota Team v1.13.39'
+          git push origin HEAD:main
