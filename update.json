@@ -1,7 +1,7 @@
 {
-  "versionCode": 83,
-  "versionName": "1.13.47",
+  "versionCode": 84,
+  "versionName": "1.13.48",
   "apkUrl": "https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk",
-  "sha256": "49f2c407e17d9acca5ecf95526c9ac17885588e08d56cb0afd8be09ff2efd992",
-  "notes": "PL: Rozbudowane opisy 540 świąt na 180 dni (21.11.2026–19.05.2027), pięć języków offline, poprawne daty i alarm OFF TASK po 15 minutach. EN: 180 days of researched observances in five offline languages and a separate 15-minute OFF TASK alarm."
+  "sha256": "d25ca5ceafd7140636e780cb4a15e96a77d35acbfdf583b186d13696d58ea307",
+  "notes": "PL: Przywrócony poprzedni układ OFF TASK: START bezpośrednio pod nagłówkiem, bez zmian kolorów, zwykłych powiadomień i alarmu po 15 minutach. Opisy 540 świąt w pięciu językach pozostają. EN: Original OFF TASK layout restored, all notifications, 15-minute alarm and 540 detailed observances preserved."
 }
