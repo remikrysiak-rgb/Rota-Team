@@ -1,0 +1,94 @@
+name: Publish RotaTeam v1.13.48 publicly
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-v1.13.48.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Download signed APK-only release bundle
+        env:
+          APK_ONLY_ZIP_URL: 'https://sdmntprdenmarkeast.oaiusercontent.com/files/00000000-cc48-8210-a683-f93e0dcc66c8/raw?se=2026-11-21T20%3A36%3A59Z&sp=r&sv=2026-06-06&sr=b&scid=4d9d956f-4ecf-5fa7-9871-ddcc54e6d107&skoid=a4604a88-85e4-4562-b6ab-a5622268de80&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-11-21T06%3A23%3A32Z&ske=2026-11-22T06%3A23%3A32Z&sks=b&skv=2026-06-06&sig=gvfA7PI59gMy6Tp8jxg8zrsJCIH%2B8dJm/vtbMuBFuzw%3D'
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --connect-timeout 15 --max-time 90 "$APK_ONLY_ZIP_URL" -o /tmp/rota-148-public.zip
+          mkdir -p /tmp/rota-148-public
+          unzip -q /tmp/rota-148-public.zip -d /tmp/rota-148-public
+          echo 'd25ca5ceafd7140636e780cb4a15e96a77d35acbfdf583b186d13696d58ea307  /tmp/rota-148-public/RotaTeam.apk' | sha256sum -c -
+          cp /tmp/rota-148-public/RotaTeam.apk RotaTeam.apk
+          test "$(stat -c%s RotaTeam.apk)" = 1405391
+          SDK_BIN="$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+          "$SDK_BIN/apksigner" verify --print-certs RotaTeam.apk | grep -qi '0aca0441c83238d5cee81efe8dfa43d8b7bc33edd1cc05e31607d51569b0e595'
+          "$SDK_BIN/aapt" dump badging RotaTeam.apk | grep -q "versionCode='84' versionName='1.13.48'"
+          ! "$SDK_BIN/aapt" dump permissions RotaTeam.apk | grep -q 'REQUEST_INSTALL_PACKAGES'
+      - name: Update existing site and app update feed without changing URLs
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          sha='d25ca5ceafd7140636e780cb4a15e96a77d35acbfdf583b186d13696d58ea307'
+          feed=Path('update.json')
+          obj=json.loads(feed.read_text(encoding='utf-8'))
+          assert obj.get('versionName')=='1.13.47' and obj.get('versionCode')==83, 'Unexpected current public release'
+          assert obj.get('apkUrl')=='https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk'
+          obj.update({
+            'versionCode':84,
+            'versionName':'1.13.48',
+            'sha256':sha,
+            'notes':'PL: Przywrócony poprzedni układ OFF TASK: START bezpośrednio pod nagłówkiem, bez zmian kolorów, zwykłych powiadomień i alarmu po 15 minutach. Opisy 540 świąt w pięciu językach pozostają. EN: Original OFF TASK layout restored, all notifications, 15-minute alarm and 540 detailed observances preserved.'
+          })
+          feed.write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          page=Path('index.html')
+          html=page.read_text(encoding='utf-8')
+          assert '1.13.47' in html and 'href="RotaTeam.apk"' in html
+          html=html.replace('1.13.47','1.13.48')
+          page.write_text(html,encoding='utf-8')
+          readme=Path('README.md')
+          text=readme.read_text(encoding='utf-8')
+          assert 'Current public version: 1.13.47' in text
+          readme.write_text(text.replace('Current public version: 1.13.47','Current public version: 1.13.48'),encoding='utf-8')
+          Path('RotaTeam.apk.sha256').write_text(sha+'  RotaTeam.apk\n',encoding='ascii')
+          PY
+      - name: Validate stable public files before publishing
+        run: |
+          set -euo pipefail
+          echo 'd25ca5ceafd7140636e780cb4a15e96a77d35acbfdf583b186d13696d58ea307  RotaTeam.apk' | sha256sum -c -
+          grep -Fq '"versionCode": 84' update.json
+          grep -Fq '"versionName": "1.13.48"' update.json
+          grep -Fq 'Current public version: 1.13.48' README.md
+          grep -Fq '1.13.48' index.html
+          grep -Fq 'href="RotaTeam.apk"' index.html
+      - name: Replace APK at existing download address
+        run: |
+          set -euo pipefail
+          git config user.name 'Rota Team Publisher'
+          git config user.email 'actions@users.noreply.github.com'
+          git add RotaTeam.apk RotaTeam.apk.sha256 update.json index.html README.md
+          git commit -m 'Publish signed v1.13.48 with original OFF TASK layout restored'
+          git push origin HEAD:main
+      - name: Publish new latest GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cat >/tmp/rt148-release-notes.txt <<'EOF'
+          RotaTeam v1.13.48 — przywrócony układ OFF TASK
+          - Przycisk START OFF TASK wraca bezpośrednio pod nagłówek, przed limit i licznik.
+          - Dotychczasowe kolory, układ reszty strony, powiadomienia o czasie i niezależny 15-minutowy alarm pozostają bez zmian.
+          - Wszystkie 540 indywidualnych opisów świąt w 5 językach pozostają.
+          - Wersja podpisana tym samym certyfikatem: można zaktualizować bez odinstalowywania aplikacji.
+          - Restore the original OFF TASK button placement without changing alarms or reminders.
+          EOF
+          if gh release view v1.13.48 >/dev/null 2>&1; then
+            gh release upload v1.13.48 RotaTeam.apk RotaTeam.apk.sha256 --clobber
+          else
+            gh release create v1.13.48 RotaTeam.apk RotaTeam.apk.sha256 --title 'RotaTeam v1.13.48' --notes-file /tmp/rt148-release-notes.txt --latest
+          fi
