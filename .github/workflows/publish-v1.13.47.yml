@@ -1,0 +1,115 @@
+name: Publish RotaTeam v1.13.47 publicly
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-v1.13.47.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Download verified signed build
+        env:
+          ARTIFACT_URL: 'https://sdmntprukwest.oaiusercontent.com/files/00000000-b104-8243-bf46-f766b02ea784/raw?se=2026-11-21T04%3A53%3A09Z&sp=r&sv=2026-06-06&sr=b&scid=f8293974-501d-539e-b198-1c74cdf1dc62&skoid=a4604a88-85e4-4562-b6ab-a5622268de80&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-11-20T07%3A00%3A29Z&ske=2026-11-21T07%3A00%3A29Z&sks=b&skv=2026-06-06&sig=zvd7lK5ebfAZ37fV0zaPZhpnO9q%2BfWneO%2BOVO%2BJ2cKU%3D'
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --connect-timeout 15 --max-time 90 "$ARTIFACT_URL" -o /tmp/rota-v1.13.47-verified.zip
+          mkdir -p /tmp/rt147
+          unzip -q /tmp/rota-v1.13.47-verified.zip 'RotaTeam-v1.13.47-test.apk' -d /tmp/rt147
+          echo '49f2c407e17d9acca5ecf95526c9ac17885588e08d56cb0afd8be09ff2efd992  /tmp/rt147/RotaTeam-v1.13.47-test.apk' | sha256sum -c -
+          cp /tmp/rt147/RotaTeam-v1.13.47-test.apk RotaTeam.apk
+          test "$(stat -c%s RotaTeam.apk)" = '1405327'
+          SDK_BIN="$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+          "$SDK_BIN/apksigner" verify --print-certs RotaTeam.apk | grep -qi '0aca0441c83238d5cee81efe8dfa43d8b7bc33edd1cc05e31607d51569b0e595'
+          ! "$SDK_BIN/aapt" dump permissions RotaTeam.apk | grep -q 'REQUEST_INSTALL_PACKAGES'
+      - name: Update website and update checker
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          sha='49f2c407e17d9acca5ecf95526c9ac17885588e08d56cb0afd8be09ff2efd992'
+          metadata={
+            'versionCode':83,
+            'versionName':'1.13.47',
+            'apkUrl':'https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk',
+            'sha256':sha,
+            'notes':'PL: Rozbudowane opisy 540 świąt na 180 dni (21.11.2026–19.05.2027), pięć języków offline, poprawne daty i alarm OFF TASK po 15 minutach. EN: 180 days of researched observances in five offline languages and a separate 15-minute OFF TASK alarm.'
+          }
+          Path('update.json').write_text(json.dumps(metadata,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          page=Path('index.html')
+          html=page.read_text(encoding='utf-8')
+          if '1.13.39' not in html:raise SystemExit('Unexpected website version, abort rather than replace')
+          html=html.replace('1.13.39','1.13.47')
+          changed=0
+          features={
+          'pl':('Kalendarz pionowy i poziomy. 1098 świąt w bazie, w tym 540 z rozbudowaną historią, znaczeniem i ciekawostkami od 21.11.2026 do 19.05.2027, po polsku i w czterech innych językach, także offline.',
+                'Licznik OFF TASK z limitem i dotychczasowymi powiadomieniami oraz osobny alarm po 15 minutach, który przypomina o zakończeniu OFF TASK.'),
+          'en':('Portrait and landscape rota calendars. 1,098 observances, including 540 with detailed history, meaning and facts from 21 Nov 2026 to 19 May 2027 in five offline languages.',
+                'OFF TASK sessions and weekly limits, familiar notifications and a separate alarm after 15 minutes to remind you to stop OFF TASK.'),
+          'ro':('Calendar vertical și orizontal. 1098 sărbători, dintre care 540 au istorie, semnificație și curiozități detaliate între 21.11.2026 și 19.05.2027, în cinci limbi offline.',
+                'Contor OFF TASK și limită săptămânală, notificările existente și o alarmă separată după 15 minute.'),
+          'hi':('पोर्ट्रेट और लैंडस्केप कैलेंडर। 1098 विशेष दिवस, जिनमें 21 नवंबर 2026 से 19 मई 2027 तक के 540 दिवसों का इतिहास, महत्व और रोचक तथ्य पाँच भाषाओं में ऑफ़लाइन उपलब्ध हैं।',
+                'OFF TASK टाइमर, साप्ताहिक सीमा, पुराने नोटिफ़िकेशन और 15 मिनट बाद अलग से बजने वाला अलार्म।'),
+          'lt':('Vertikalus ir horizontalus kalendorius. 1098 minėtinos dienos, iš jų 540 su išsamia istorija, reikšme ir įdomybėmis nuo 2026-11-21 iki 2027-05-19 penkiomis kalbomis, taip pat neprisijungus.',
+                'OFF TASK laikmatis, savaitės limitas, įprasti pranešimai ir atskiras žadintuvas po 15 minučių.')
+          }
+          for lang,(holiday,offtask) in features.items():
+            lines=html.splitlines()
+            for n,line in enumerate(lines):
+              if line.startswith(lang+':{'):
+                for key,value in [('f1p',holiday),('f3p',offtask)]:
+                  pattern=r'(?<!\\w)'+key+r':"[^"]*"'
+                  line,count=re.subn(pattern,lambda m:key+':"'+value+'"',line,count=1)
+                  if count!=1:raise SystemExit('Missing '+lang+' '+key)
+                lines[n]=line
+                changed+=1
+                break
+            html='\n'.join(lines)
+          if changed!=5:raise SystemExit('Not all five languages updated')
+          assert 'href="RotaTeam.apk"' in html and '1.13.39' not in html
+          page.write_text(html+'\n' if not html.endswith('\n') else html,encoding='utf-8')
+          readme=Path('README.md')
+          readme.write_text('# Rota-Team\nRota Team 1–4 • Work rota and OFF TASK tracker for Android\n\nCurrent public version: 1.13.47\n\nDownload: https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk\n',encoding='utf-8')
+          Path('RotaTeam.apk.sha256').write_text(sha+'  RotaTeam.apk\n',encoding='ascii')
+          PY
+      - name: Validate public payload
+        run: |
+          set -euo pipefail
+          echo '49f2c407e17d9acca5ecf95526c9ac17885588e08d56cb0afd8be09ff2efd992  RotaTeam.apk' | sha256sum -c -
+          grep -Fq '"versionCode": 83' update.json
+          grep -Fq '"versionName": "1.13.47"' update.json
+          grep -Fq 'Current public version: 1.13.47' README.md
+          grep -Fq 'v1.13.47' index.html
+          grep -q 'RotaTeam.apk' index.html
+      - name: Publish stable download link without changing URL
+        run: |
+          set -euo pipefail
+          git config user.name 'Rota Team Publisher'
+          git config user.email 'actions@users.noreply.github.com'
+          git add RotaTeam.apk RotaTeam.apk.sha256 update.json index.html README.md
+          git commit -m 'Publish signed RotaTeam v1.13.47 and 5-language website'
+          git push origin HEAD:main
+      - name: Create stable public GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cat >/tmp/rt147-release-notes.txt <<'EOF'
+          RotaTeam v1.13.47
+          - 180 days of researched observances from 21 November 2026 to 19 May 2027 (540 individual articles, 5 offline languages).
+          - Improved moving holiday dates, detailed history, meaning and source links.
+          - Independent 15-minute OFF TASK alarm alongside existing reminders.
+          - Maintains existing app layout and settings; signed for upgrades.
+          - Uses no REQUEST_INSTALL_PACKAGES permission.
+          EOF
+          if gh release view v1.13.47 >/dev/null 2>&1; then
+            gh release upload v1.13.47 RotaTeam.apk RotaTeam.apk.sha256 --clobber
+          else
+            gh release create v1.13.47 RotaTeam.apk RotaTeam.apk.sha256 --title 'RotaTeam v1.13.47' --notes-file /tmp/rt147-release-notes.txt --latest
+          fi
