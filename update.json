@@ -1,7 +1,7 @@
 {
-  "versionCode": 85,
-  "versionName": "1.13.49",
+  "versionCode": 89,
+  "versionName": "1.13.53",
   "apkUrl": "https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk",
-  "sha256": "934eb24980c1890bd4679aff9ab6b8cf651ca91b77c8dda29931be4b12b05af2",
-  "notes": "PL: Kompaktowe formatowanie ekranu głównego: mniejszy nagłówek, prognoza i OFF TASK, na wzór starszej wersji. Zachowane wszystkie motywy, przypomnienia, osobny alarm po 15 minutach i 540 opisów świąt. EN: Compact home layout with original themes, OFF TASK reminders and alarm, and all holiday details unchanged."
+  "sha256": "e2a7d215b75e67f7e38c74a730bd93df3dc90e42dd2fef00bcea49b5565999ea",
+  "notes": "PL: Dotknij daty, aby zobaczyć, które z teamów 1–4 pracują, a które mają wolne. Dotknij logo, aby powtórzyć czterosekundową animację 3D. EN: Tap the date to see which of Teams 1–4 are working or off. Tap the logo to replay its four-second 3D animation."
 }
