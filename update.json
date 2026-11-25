@@ -1,7 +1,7 @@
 {
-  "versionCode": 91,
-  "versionName": "1.13.55",
+  "versionCode": 92,
+  "versionName": "1.13.56",
   "apkUrl": "https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk",
-  "sha256": "a72b6fcbfd73e9b52bbffc8b97f502df359415ab928960e17069992cff2a11ca",
-  "notes": "PL: Osobne dzwonki pobudki i alarmu po 15 minutach OFF TASK, język malajalam i logo 3D z przesuwającym się refleksem. EN: Separate sounds for your wake-up alarm and 15-minute OFF TASK alarm, Malayalam support and a softly lit 3D logo."
+  "sha256": "6cc65c88732f77fe798e0477fa12b3dfd9452209263a35c35dc1d577dd858bde",
+  "notes": "PL: 600 tekstów dnia w każdym języku. Pasują do grafiku, a czasem też do pogody i pory roku. EN: 600 daily messages in each language, matched to your rota and occasionally to the weather or season."
 }
