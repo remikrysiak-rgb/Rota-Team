@@ -1,7 +1,7 @@
 {
-  "versionCode": 92,
-  "versionName": "1.13.56",
+  "versionCode": 95,
+  "versionName": "1.13.59",
   "apkUrl": "https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk",
-  "sha256": "6cc65c88732f77fe798e0477fa12b3dfd9452209263a35c35dc1d577dd858bde",
-  "notes": "PL: 600 tekstów dnia w każdym języku. Pasują do grafiku, a czasem też do pogody i pory roku. EN: 600 daily messages in each language, matched to your rota and occasionally to the weather or season."
+  "sha256": "777442dad4ea0358a21b321163aaa6a95b7b96c3c7435f166ab64defffd6bf4c",
+  "notes": "PL: Imię i liczba zmian przed wolnym w wybranych tekstach, krótkie teksty przed większymi świętami oraz cieplejszy refleks na powiększonym logo. EN: Occasional first-name and work-streak messages, festive lead-ins, and a warmer glint on the enlarged logo."
 }
