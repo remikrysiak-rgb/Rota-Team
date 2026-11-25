@@ -1,7 +1,7 @@
 {
-  "versionCode": 89,
-  "versionName": "1.13.53",
+  "versionCode": 91,
+  "versionName": "1.13.55",
   "apkUrl": "https://remikrysiak-rgb.github.io/Rota-Team/RotaTeam.apk",
-  "sha256": "e2a7d215b75e67f7e38c74a730bd93df3dc90e42dd2fef00bcea49b5565999ea",
-  "notes": "PL: Dotknij daty, aby zobaczyć, które z teamów 1–4 pracują, a które mają wolne. Dotknij logo, aby powtórzyć czterosekundową animację 3D. EN: Tap the date to see which of Teams 1–4 are working or off. Tap the logo to replay its four-second 3D animation."
+  "sha256": "a72b6fcbfd73e9b52bbffc8b97f502df359415ab928960e17069992cff2a11ca",
+  "notes": "PL: Osobne dzwonki pobudki i alarmu po 15 minutach OFF TASK, język malajalam i logo 3D z przesuwającym się refleksem. EN: Separate sounds for your wake-up alarm and 15-minute OFF TASK alarm, Malayalam support and a softly lit 3D logo."
 }
